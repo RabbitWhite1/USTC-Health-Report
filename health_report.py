@@ -2,9 +2,9 @@ import requests
 import re
 import datetime
 import os
-from win10toast import ToastNotifier
 import platform
 import time
+from win10toast import ToastNotifier
 
 
 def done_today(log_path):
@@ -14,7 +14,7 @@ def done_today(log_path):
     lines = log.readlines()
     last = None
     for line in lines[::-1]:
-        if line.find('succeed'):
+        if line.find('succeed') != -1:
             date_str = line[2: 21]
             last = datetime.datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
             break

@@ -37,6 +37,14 @@ def main():
         
     # do command
     if args.install:
+        # check win10toast
+        try:
+            import win10toast
+        except ModuleNotFoundError as e:
+            print(e)
+            print('please install win10toast: pip install win10toast')
+            return 1
+
         # create login.txt for username and password
         if not args.keep:
             login = open('login.txt', 'w')
