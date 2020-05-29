@@ -1,5 +1,7 @@
 # USTC Health Report
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/RabbitWhite1/USTC-Health-Report/blob/master/LICENSE)
+
 Windows-10 下的 USTC 健康上报脚本. 借助 Windows-10 自带的 `task schedule` 完成定时上报.
 
 **本脚本纯属娱乐, 请认真完成健康信息上报. 本人不负责任何损失.**
