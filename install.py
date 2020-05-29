@@ -52,6 +52,10 @@ def main():
             login.write(username)
             passwd = input('passwd: ') + '\n'
             login.write(passwd)
+            province = input('省邮政编码: ') + '\n'
+            login.write(province)
+            city = input('市邮政编码: ') + '\n'
+            login.write(city)
             login.close()
 
         # get the path of install.py to get the path of health_report.py

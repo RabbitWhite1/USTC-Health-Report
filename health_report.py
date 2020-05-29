@@ -33,28 +33,30 @@ def main():
         return 0
 
     error = False
-
-    headers = {
-                'user-agent':
-                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) '
-                        'AppleWebKit/537.36 (KHTML, like Gecko) '
-                        'Chrome/79.0.3945.117 '
-                        'Safari/537.36'
-                                                }
-
-    session = requests.session()
-    session.headers.update(headers)
-
-    # login
-    f = open(path + 'login.txt', 'r')
-    username = f.readline().strip(" \n\t\r")
-    password = f.readline().strip(" \n\t\r")
-    f.close()
-    data = {'username': username, 'password': password}
+    
     try:
+        headers = {
+                    'user-agent':
+                            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) '
+                            'AppleWebKit/537.36 (KHTML, like Gecko) '
+                            'Chrome/79.0.3945.117 '
+                            'Safari/537.36'
+                                                    }
+
+        session = requests.session()
+        session.headers.update(headers)
+
+        # login
+        f = open(path + 'login.txt', 'r')
+        username = f.readline().strip(" \n\t\r")
+        password = f.readline().strip(" \n\t\r")
+        province = f.readline().strip(" \n\t\r")
+        city = f.readline().strip(" \n\t\r")
+        f.close()
+        data = {'username': username, 'password': password}
         response = session.post("https://passport.ustc.edu.cn/login?service=https%3A%2F%2Fweixine.ustc.edu.cn%2F2020%2Fcaslogin", data=data)
         print(response)
-        # print(response.text)
+        
         # get the token
         # the format is like: <input type="hidden" name="_token" value="3RC1qDj08YCj9DXIwjGXXCaz45fLjQxm6LEX4dFt">
 
@@ -65,8 +67,8 @@ def main():
 
         param = {"_token":token,
                 "now_address":"1","gps_now_address":"",
-                "now_province":"350000","gps_province":"",
-                "now_city":"350500","gps_city":"",
+                "now_province":province,"gps_province":"",
+                "now_city":city,"gps_city":"",
                 "now_detail":"",
                 "body_condition":"1","body_condition_detail":"",
                 "now_status":"2","now_status_detail":"", 
@@ -93,7 +95,7 @@ def main():
                             threaded=True)
         return 1
     else:
-        message = ('succeed!' if response.status_code == 200 else 'failed(status code: )!'.format(response.sstatus_code)) + '\n'
+        message = ('succeed!' if response.status_code == 200 else 'failed(status code: )!'.format(response.sstatus_code)) + ' (province: {}, city: {})'.format(province, city) +'\n'
         f = open(path + 'report.log', 'a')
         f.write('[ ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' ]\t' + message)
         f.close()
