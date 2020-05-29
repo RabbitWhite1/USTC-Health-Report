@@ -9,7 +9,9 @@ def get_parser():
     group.add_argument('-i', '--install', help='install into task schedule', action='store_true')
     group.add_argument('-u', '--uninstall', help='uninstall from task schedule', action='store_true')
     parser.add_argument('-f', '--frequence', help='the frequence mode. hourly by default', choices=['hourly', 'minute'])
-    parser.add_argument('-c', '--cycle', help='the interval. 2 by default', type=int)
+    parser.add_argument('-c', '--cycle', help='the interval in units of frequence(-f to specify). 2 by default', type=int)
+    parser.add_argument('-t', '--terminal', help='show the terminal each time it runs. No show by default', action='store_true')
+    parser.add_argument('-k', '--keep', help='still use the username and passwd in login.txt', action='store_true')
     return parser
 
 
@@ -30,16 +32,19 @@ def main():
     # check is pythonw.exe accessible
     executable = sys.executable
     executable_w = executable[:-4] + 'w.exe'
-    if os.access(executable_w, os.F_OK):
+    if os.access(executable_w, os.F_OK) and not args.terminal:
         executable = executable_w
         
     # do command
     if args.install:
         # create login.txt for username and password
-        login = open('login.txt', 'w')
-        login.write(input('username: ') + '\n')
-        login.write(input('passwd: ') + '\n')
-        login.close()
+        if not args.keep:
+            login = open('login.txt', 'w')
+            username = input('username: ') + '\n'
+            login.write(username)
+            passwd = input('passwd: ') + '\n'
+            login.write(passwd)
+            login.close()
 
         # get the path of install.py to get the path of health_report.py
         path = os.path.split(os.path.realpath(__file__))[0]
@@ -52,13 +57,13 @@ def main():
         command = 'schtasks /create /sc {} /mo {} /tn "Health Report" /tr "{} {}"'.format(frequence, cycle, executable, path + '\health_report.py')
         os.system(command)
         f = open('report.log', 'a')
-        f.write('[ ' + datetime.datetime.now().__str__() + ' ]\t' + 'installed the task!\n')
+        f.write('[ ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' ]\t' + 'installed the task!\n')
         f.close()
     elif args.uninstall:
         command = 'schtasks /delete /tn "Health Report"'
         os.system(command)
         f = open('report.log', 'a')
-        f.write('[ ' + datetime.datetime.now().__str__() + ' ]\t' + 'uninstalled the task!\n')
+        f.write('[ ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' ]\t' + 'uninstalled the task!\n')
         f.close()
 
     return 0
