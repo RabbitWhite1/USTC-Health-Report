@@ -30,6 +30,8 @@ This command will create a task that run the report script `health_report.py` ev
 
 Before reporting, `report.log` will be checked to prevent a duplicate report.
 
+Don't move your `health_report.py` after installed. Or you can reinstall after that.
+
 ### Uninstall
 
 just run
