@@ -2,11 +2,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/RabbitWhite1/USTC-Health-Report/blob/master/LICENSE)
 
-Windows-10 下的 USTC 健康上报脚本. 借助 Windows-10 自带的 `task schedule` 完成定时上报.
+Windows-10 下的 USTC 健康上报脚本. 借助 Windows-10 自带的 `task schedule` 完成定时上报, 并用Win10的消息提示来提醒上报成功与否.
 
 **本脚本纯属娱乐, 请认真完成健康信息上报. 本人不负责任何损失.**
 
-由于使用的是 win10 的 `task schedule`, 需要任务执行时保证电脑在线.
+由于使用的是 win10 的 `task schedule`, 需要任务执行时保证电脑在线. 可以通过修改上报频率提高上报成功率. 
 
 ## Special Package Requirements
 
