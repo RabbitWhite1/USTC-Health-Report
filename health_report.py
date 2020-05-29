@@ -25,6 +25,20 @@ def done_today(log_path):
     return False
 
 
+def toast_log(message, log_path):
+    f = open(log_path, 'a')
+    f.write('[ ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' ]\t' + message)
+    f.close()
+    
+    if platform.platform().find('Windows-10') != -1:
+        toaster = ToastNotifier()
+        toaster.show_toast("中国科大健康打卡",
+                        message,
+                        icon_path=None,
+                        duration=5,
+                        threaded=True)
+    return 1
+
 def main():
     path = os.path.split(os.path.realpath(__file__))[0] + '\\'
 
@@ -53,6 +67,9 @@ def main():
         province = f.readline().strip(" \n\t\r")
         city = f.readline().strip(" \n\t\r")
         f.close()
+        if len(province) != 6 or len(city) != 6:
+            toast_log('邮政编码有误, 请确认. (povince={}, city={})'.format(province, city), path + 'report.log')
+            return 1
         data = {'username': username, 'password': password}
         response = session.post("https://passport.ustc.edu.cn/login?service=https%3A%2F%2Fweixine.ustc.edu.cn%2F2020%2Fcaslogin", data=data)
         print(response)
@@ -81,32 +98,11 @@ def main():
         response = session.post("https://weixine.ustc.edu.cn/2020/daliy_report", data=param)
         print(response)
     except Exception as e:
-        message = str(e) + '\n'
-        f = open(path + 'report.log', 'a')
-        f.write('[ ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' ]\t' + message)
-        f.close()
-        
-        if platform.platform().find('Windows-10') != -1:
-            toaster = ToastNotifier()
-            toaster.show_toast("中国科大健康打卡",
-                            "出现错误！" + message,
-                            icon_path=None,
-                            duration=5,
-                            threaded=True)
+        toast_log('出现错误!' + str(e) + '\n', path + 'report.log')
         return 1
     else:
         message = ('succeed!' if response.status_code == 200 else 'failed(status code: )!'.format(response.sstatus_code)) + ' (province: {}, city: {})'.format(province, city) +'\n'
-        f = open(path + 'report.log', 'a')
-        f.write('[ ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' ]\t' + message)
-        f.close()
-        
-        if platform.platform().find('Windows-10') != -1:
-            toaster = ToastNotifier()
-            toaster.show_toast("中国科大健康打卡",
-                            message,
-                            icon_path=None,
-                            duration=5,
-                            threaded=True)
+        toast_log(message, path + 'report.log')
 
     return 0
 
