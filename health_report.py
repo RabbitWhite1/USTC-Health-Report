@@ -66,6 +66,8 @@ def main():
         password = f.readline().strip(" \n\t\r")
         province = f.readline().strip(" \n\t\r")
         city = f.readline().strip(" \n\t\r")
+        # 默认用西校区代码
+        is_inschool = "6"
         f.close()
         if len(province) != 6 or len(city) != 6:
             toast_log('邮政编码有误, 请确认. (povince={}, city={})'.format(province, city), path + 'report.log')
@@ -83,17 +85,16 @@ def main():
         print(token)
 
         param = {"_token":token,
-                "now_address":"1","gps_now_address":"",
-                "now_province":province,"gps_province":"",
-                "now_city":city,"gps_city":"",
-                "now_detail":"",
-                "body_condition":"1","body_condition_detail":"",
-                "now_status":"2","now_status_detail":"", 
-                "has_fever":"0",
-                "last_touch_sars":"0","last_touch_sars_date":"","last_touch_sars_detail":"",
-                "last_touch_hubei":"0","last_touch_hubei_date":"","last_touch_hubei_detail":"",
-                "last_cross_hubei":"0","last_cross_hubei_date":"","last_cross_hubei_detail":"",
-                "return_dest":"1","return_dest_detail":"","other_detail":""}
+                 "now_address":"1","gps_now_address":"1",
+                 "gps_province":province,"gps_city":city,"now_detail":"",
+                 "is_inschool":is_inschool,
+                 "body_condition":"1","body_condition_detail":"",
+                 "now_status":"2","now_status_detail":"",
+                 "has_fever":"0",
+                 "last_touch_sars":"0","last_touch_sars_date":"","last_touch_sars_detail":"",
+                 "last_touch_hubei":"0","last_touch_hubei_date":"","last_touch_hubei_detail":"",
+                 "last_cross_hubei":"0","last_cross_hubei_date":"","last_cross_hubei_detail":"",
+                 "return_dest":"1","return_dest_detail":"","other_detail":""}
 
         response = session.post("https://weixine.ustc.edu.cn/2020/daliy_report", data=param)
         print(response)
