@@ -52,9 +52,9 @@ def main():
             login.write(username)
             passwd = input('passwd: ') + '\n'
             login.write(passwd)
-            province = input('省邮政编码: ') + '\n'
+            province = input('省行政编号: ') + '\n'
             login.write(province)
-            city = input('市邮政编码: ') + '\n'
+            city = input('市行政编号: ') + '\n'
             login.write(city)
             login.close()
 
