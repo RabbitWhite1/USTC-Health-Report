@@ -4,7 +4,12 @@ import datetime
 import os
 import platform
 import time
-from win10toast import ToastNotifier
+win10 = False
+if platform.platform().find('Windows-10') != -1:
+    win10 = True
+    from win10toast import ToastNotifier
+
+path = os.path.split(os.path.realpath(__file__))[0] + ('\\' if win10 else '/')
 
 
 def done_today(log_path):
@@ -30,20 +35,16 @@ def toast_log(message, log_path):
     f.write('[ ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' ]\t' + message)
     f.close()
     
-    if platform.platform().find('Windows-10') != -1:
+    if win10:
         toaster = ToastNotifier()
-        toaster.show_toast("中国科大健康打卡",
+        toaster.show_toast('中国科大健康打卡',
                         message,
                         icon_path=None,
                         duration=5,
                         threaded=True)
-    return 1
 
 def main():
-    path = os.path.split(os.path.realpath(__file__))[0] + '\\'
-
     if done_today(path + 'report.log'):
-        toaster = ToastNotifier()
         return 0
 
     error = False
