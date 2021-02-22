@@ -5,6 +5,7 @@ import os
 import os.path as osp
 import platform
 import time
+from bs4 import BeautifulSoup
 win10 = False
 if platform.platform().find('Windows-10') != -1:
     win10 = True
@@ -52,12 +53,12 @@ def main():
     
     try:
         headers = {
-                    'user-agent':
-                            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) '
-                            'AppleWebKit/537.36 (KHTML, like Gecko) '
-                            'Chrome/79.0.3945.117 '
-                            'Safari/537.36'
-                                                    }
+            'user-agent':
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) '
+                'AppleWebKit/537.36 (KHTML, like Gecko) '
+                'Chrome/79.0.3945.117 '
+                'Safari/537.36',
+            'connection': 'close'}
 
         session = requests.session()
         session.headers.update(headers)
@@ -74,15 +75,19 @@ def main():
         if len(province) != 6 or len(city) != 6:
             toast_log('邮政编码有误, 请确认. (povince={}, city={})'.format(province, city), path + 'report.log')
             return 1
-        data = {'username': username, 'password': password}
+
+        # 登录
+        data = {'username': username, 'password': password,
+                'service': "https://weixine.ustc.edu.cn/2020/caslogin", 'model': "uplogin.jsp",
+                'warn': '', 'showCode': '', 'button': ''}
+        print(f'province: {province}, city: {city}')
         response = session.post("https://passport.ustc.edu.cn/login?service=https%3A%2F%2Fweixine.ustc.edu.cn%2F2020%2Fcaslogin", data=data)
-        print(response)
-        
-        # get the token
-        # the format is like: <input type="hidden" name="_token" value="3RC1qDj08YCj9DXIwjGXXCaz45fLjQxm6LEX4dFt">
-        raw_token = re.search(r'<input type="hidden" name="_token" value=".*">', response.text).group(0)
-        str_value = 'value="'
-        token = raw_token[raw_token.find(str_value) + len(str_value) : -2]
+        response_html = BeautifulSoup(response.content, 'lxml').__str__()
+        print(f'登陆结果: {response}')
+                
+        # 获取 token
+        # the format is like: <input name="_token" type="hidden" value="oZxXvuJav4tIWy7nHrdR6VuOsV9WS2tgdIluFdWM"/>
+        token = re.search(r'<input name="_token" type="hidden" value="(.*)"/>', response_html).group(1)
         print(token)
 
         # 在校的话用这个
@@ -108,8 +113,9 @@ def main():
             "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", "other_detail": ""
         }
         response = session.post("https://weixine.ustc.edu.cn/2020/daliy_report", data=param)
-        print(response)
+        print(f'上报结果: {response}')
     except Exception as e:
+        print(str(e))
         toast_log('出现错误!' + str(e) + '\n', osp.join(dirname, 'report.log'))
         return 1
     else:
