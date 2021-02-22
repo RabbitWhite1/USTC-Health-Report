@@ -62,7 +62,8 @@ def main():
 
         session = requests.session()
         session.headers.update(headers)
-
+        session.trust_env = False
+        
         # login
         f = open(osp.join(dirname, 'login.txt'), 'r')
         username = f.readline().strip(" \n\t\r")
