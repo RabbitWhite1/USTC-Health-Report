@@ -81,7 +81,6 @@ def main():
         data = {'username': username, 'password': password,
                 'service': "https://weixine.ustc.edu.cn/2020/caslogin", 'model': "uplogin.jsp",
                 'warn': '', 'showCode': '', 'button': ''}
-        print(f'province: {province}, city: {city}')
         response = session.post("https://passport.ustc.edu.cn/login?service=https%3A%2F%2Fweixine.ustc.edu.cn%2F2020%2Fcaslogin", data=data)
         response_html = BeautifulSoup(response.content, 'lxml').__str__()
         print(f'登陆结果: {response}')
@@ -92,27 +91,39 @@ def main():
         print(token)
 
         # 在校的话用这个
-        """
-        param = {"_token":token,
-                 "now_address":"1","gps_now_address":"1",
-                 "gps_province":province,"gps_city":city,"now_detail":"",
-                 "is_inschool":is_inschool,
-                 "body_condition":"1","body_condition_detail":"",
-                 "now_status":"2","now_status_detail":"",
-                 "has_fever":"0",
-                 "last_touch_sars":"0","last_touch_sars_date":"","last_touch_sars_detail":"",
-                 "last_touch_hubei":"0","last_touch_hubei_date":"","last_touch_hubei_detail":"",
-                 "last_cross_hubei":"0","last_cross_hubei_date":"","last_cross_hubei_detail":"",
-                 "return_dest":"1","return_dest_detail":"","other_detail":""}
-        """
-        # 在家用这个
         param = {
+            "_token": token,
+            "now_address": "1",
+            "gps_now_address": "",
+            "now_province": "340000", # 安徽省编码
+            "gps_province": "",
+            "now_city": "340100", # 合肥市编码
+            "gps_city": "",
+            "now_detail": "",
+            "is_inschool": "6", # 西校区
+            "body_condition": "1",
+            "body_condition_detail": "",
+            "now_status": "1",
+            "now_status_detail": "",
+            "has_fever": "0",
+            "last_touch_sars": "0",
+            "last_touch_sars_date": "",
+            "last_touch_sars_detail": "",
+            "other_detail": ""
+        }
+                 
+        # 在家用这个
+        """param = {
             "_token": token,
             "now_address": "1", "gps_now_address": "", "now_province": province, "gps_province": "",
             "now_city": city, "gps_city": "", "now_detail": "",
             "body_condition": "1", "body_condition_detail": "",  "now_status": "2", "now_status_detail": "",
             "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", "other_detail": ""
-        }
+        }"""
+
+        province = param["now_province"]
+        city = param["now_city"]
+        print(f'province: {province}, city: {city}')
         response = session.post("https://weixine.ustc.edu.cn/2020/daliy_report", data=param)
         print(f'上报结果: {response}')
     except Exception as e:
@@ -120,7 +131,7 @@ def main():
         toast_log('出现错误!' + str(e) + '\n', osp.join(dirname, 'report.log'))
         return 1
     else:
-        message = ('succeed!' if response.status_code == 200 else 'failed(status code: )!'.format(response.sstatus_code)) + ' (province: {}, city: {})'.format(province, city) +'\n'
+        message = ('succeed!' if response.status_code == 200 else f'failed(status code: {response.sstatus_code})!') + f' (province: {province}, city: {city})\n'
         toast_log(message, osp.join(dirname, 'report.log'))
 
     return 0
