@@ -50,8 +50,6 @@ def toast_log(message, log_path):
 def main():
     if done_today(osp.join(dirname, 'report.log')):
         return 0
-
-    error = False
     
     try:
         headers = {
@@ -148,7 +146,7 @@ def main():
         if response.status_code == 200:
             message = 'succeed!'
         else:
-            message = f'failed(status code: {response.sstatus_code})! '
+            message = f'failed(status code: {response.status_code})! '
         if data_template == 'abroad':
             message += f'(country: {country})\n'
         else:
