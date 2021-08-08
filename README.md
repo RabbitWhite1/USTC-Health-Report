@@ -26,7 +26,7 @@ To install the script into `task schedule`, run
 python install.py -i
 ```
 
-and type in the username and passwd(**USTC统一验证**的用户名和密码), as well as the postal codes, which will simply be stored in `login.txt`.
+and type in the username and passwd(**USTC统一验证**的用户名和密码), as well as the postal codes, which will simply be stored in `data.json`.
 
 This command will create a task that run the report script `health_report.py` every 2 hours. (to set the frequence, see [this](#jump))
 
