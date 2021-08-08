@@ -5,7 +5,9 @@ import os
 import os.path as osp
 import platform
 import time
+import json
 from bs4 import BeautifulSoup
+from pprint import pprint
 win10 = False
 if platform.platform().find('Windows-10') != -1:
     win10 = True
@@ -65,17 +67,20 @@ def main():
         session.trust_env = False
         
         # login
-        f = open(osp.join(dirname, 'login.txt'), 'r')
-        username = f.readline().strip(" \n\t\r")
-        password = f.readline().strip(" \n\t\r")
-        province = f.readline().strip(" \n\t\r")
-        city = f.readline().strip(" \n\t\r")
-        # 默认用西校区代码
-        is_inschool = "6"
-        f.close()
-        if len(province) != 6 or len(city) != 6:
-            toast_log('邮政编码有误, 请确认. (povince={}, city={})'.format(province, city), path + 'report.log')
-            return 1
+        with open(osp.join(dirname, 'data.json'), 'r', encoding='utf-8') as f:
+            data = json.load(f, encoding='utf-8')
+        username = data['username']
+        password = data['passwd']
+        data_template = data['data_template']
+        if data_template == 'abroad':
+            country = data['country']
+            abroad_status_detail = data['abroad_status_detail']
+        else:
+            province = data['province_postcode']
+            city = data['city_postcode']
+            if len(province) != 6 or len(city) != 6:
+                toast_log('邮政编码格式有误, 请确认. (povince={}, city={})'.format(province, city), osp.join(dirname, 'report.log'))
+                return 1
 
         # 登录
         data = {'username': username, 'password': password,
@@ -88,42 +93,51 @@ def main():
         # 获取 token
         # the format is like: <input name="_token" type="hidden" value="oZxXvuJav4tIWy7nHrdR6VuOsV9WS2tgdIluFdWM"/>
         token = re.search(r'<input name="_token" type="hidden" value="(.*)"/>', response_html).group(1)
-        print(token)
+        print(f'token: {token}')
 
-        # 在校的话用这个
-        param = {
-            "_token": token,
-            "now_address": "1",
-            "gps_now_address": "",
-            "now_province": "340000", # 安徽省编码
-            "gps_province": "",
-            "now_city": "340100", # 合肥市编码
-            "gps_city": "",
-            "now_detail": "",
-            "is_inschool": "6", # 西校区
-            "body_condition": "1",
-            "body_condition_detail": "",
-            "now_status": "1",
-            "now_status_detail": "",
-            "has_fever": "0",
-            "last_touch_sars": "0",
-            "last_touch_sars_date": "",
-            "last_touch_sars_detail": "",
-            "other_detail": ""
-        }
-                 
-        # 在家用这个
-        """param = {
-            "_token": token,
-            "now_address": "1", "gps_now_address": "", "now_province": province, "gps_province": "",
-            "now_city": city, "gps_city": "", "now_detail": "",
-            "body_condition": "1", "body_condition_detail": "",  "now_status": "2", "now_status_detail": "",
-            "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", "other_detail": ""
-        }"""
-
-        province = param["now_province"]
-        city = param["now_city"]
-        print(f'province: {province}, city: {city}')
+        if data_template == 'abroad':
+            # 在国外
+            param = {
+                "_token": token,
+                "now_address": "3", "gps_now_address": "", "gps_province": "",
+                "gps_city": "", "now_detail": country,
+                "body_condition": "1", "body_condition_detail": "",  "now_status": "6", "now_status_detail": abroad_status_detail,
+                "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", "other_detail": ""
+            }
+        elif data_template == 'home':   
+            # 在国内且不在学校
+            # now_status 2 表示在家, 6 表示其他
+            param = {
+                "_token": token,
+                "now_address": "1", "gps_now_address": "", "now_province": province, "gps_province": "",
+                "now_city": city, "gps_city": "", "now_detail": "",
+                "body_condition": "1", "body_condition_detail": "",  "now_status": "2", "now_status_detail": "",
+                "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", "other_detail": ""
+            }
+        else:
+            # 默认在校, 且西校区
+            param = {
+                "_token": token,
+                "now_address": "1",
+                "gps_now_address": "",
+                "now_province": "340000", # 安徽省编码
+                "gps_province": "",
+                "now_city": "340100", # 合肥市编码
+                "gps_city": "",
+                "now_detail": "",
+                "is_inschool": "6", # 西校区
+                "body_condition": "1",
+                "body_condition_detail": "",
+                "now_status": "1",
+                "now_status_detail": "",
+                "has_fever": "0",
+                "last_touch_sars": "0",
+                "last_touch_sars_date": "",
+                "last_touch_sars_detail": "",
+                "other_detail": ""
+            }
+        print('Using these post data:')
+        pprint(param)
         response = session.post("https://weixine.ustc.edu.cn/2020/daliy_report", data=param)
         print(f'上报结果: {response}')
     except Exception as e:
@@ -131,7 +145,14 @@ def main():
         toast_log('出现错误!' + str(e) + '\n', osp.join(dirname, 'report.log'))
         return 1
     else:
-        message = ('succeed!' if response.status_code == 200 else f'failed(status code: {response.sstatus_code})!') + f' (province: {province}, city: {city})\n'
+        if response.status_code == 200:
+            message = 'succeed!'
+        else:
+            message = f'failed(status code: {response.sstatus_code})! '
+        if data_template == 'abroad':
+            message += f'(country: {country})\n'
+        else:
+            message += f'(province: {province}, city: {city})\n'
         toast_log(message, osp.join(dirname, 'report.log'))
 
     return 0

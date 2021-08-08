@@ -2,6 +2,7 @@ import sys
 import os
 import argparse
 import datetime
+import json
 
 def get_parser():
     parser = argparse.ArgumentParser(description="* Auto Health Report Installer *")
@@ -11,7 +12,10 @@ def get_parser():
     parser.add_argument('-f', '--frequence', help='the frequence mode. hourly by default', choices=['hourly', 'minute'])
     parser.add_argument('-c', '--cycle', help='the interval in units of frequence(-f to specify). 2 by default', type=int)
     parser.add_argument('-t', '--terminal', help='show the terminal each time it runs. No show by default', action='store_true')
-    parser.add_argument('-k', '--keep', help='still use the username and passwd in login.txt', action='store_true')
+    parser.add_argument('-k', '--keep', help='still use the username and passwd in data.json', action='store_true')
+    parser.add_argument('-a', '--abroad', help='if you are abroad', action='store_true')
+    parser.add_argument('-s', '--school', help="if you are at school(I assume students living in non-west campus won't use this script.)", action='store_true')
+    parser.add_argument('-o', '--home', help="if you are at home", action='store_true')
     return parser
 
 
@@ -45,17 +49,37 @@ def main():
             print('please install win10toast: pip install win10toast')
             return 1
 
-        # create login.txt for username and password
+        # create data.json for username and password
         if not args.keep:
-            login = open('login.txt', 'w')
-            username = input('username: ') + '\n'
-            login.write(username)
-            passwd = input('passwd: ') + '\n'
-            login.write(passwd)
-            province = input('省行政编号: ') + '\n'
-            login.write(province)
-            city = input('市行政编号: ') + '\n'
-            login.write(city)
+            location = input("abroad|school|home: ")
+            if location == 'abroad':
+                args.abroad = True
+            elif location == 'school':
+                args.school = True
+            elif location == 'home':
+                args.home = True
+            else:
+                print('wrong input!')
+            login = open('data.json', 'w', encoding='utf-8')
+            data = {}
+            username = input('username: ')
+            data['username'] = username
+            passwd = input('passwd: ')
+            data['passwd'] = passwd
+            if args.abroad:
+                data['data_template'] = 'abroad'
+                data['country'] = input('所在国家/地区: ')
+                data['abroad_status_detail'] = input('在国外详细情况: ')
+            else:
+                if args.school:
+                    data['data_template'] = 'school'
+                else:
+                    data['data_template'] = 'home'
+                    province = input('省行政编号: ')
+                    data['province_postcode'] = province
+                    city = input('市行政编号: ')
+                    data['city_postcode'] = city
+            login.write(json.dumps(data, ensure_ascii=False))
             login.close()
 
         # get the path of install.py to get the path of health_report.py
