@@ -12,7 +12,7 @@ def get_parser():
     parser.add_argument('-f', '--frequence', help='the frequence mode. hourly by default', choices=['hourly', 'minute'])
     parser.add_argument('-c', '--cycle', help='the interval in units of frequence(-f to specify). 2 by default', type=int)
     parser.add_argument('-t', '--terminal', help='show the terminal each time it runs. No show by default', action='store_true')
-    parser.add_argument('-k', '--keep', help='still use the username and passwd in data.json', action='store_true')
+    parser.add_argument('-k', '--keep', help='still use the username and passwd in etc/data.json', action='store_true')
     parser.add_argument('-a', '--abroad', help='if you are abroad', action='store_true')
     parser.add_argument('-s', '--school', help="if you are at school(I assume students living in non-west campus won't use this script.)", action='store_true')
     parser.add_argument('-o', '--home', help="if you are at home", action='store_true')
@@ -49,7 +49,7 @@ def main():
             print('please install win10toast: pip install win10toast')
             return 1
 
-        # create data.json for username and password
+        # create etc/data.json for username and password
         if not args.keep:
             location = input("abroad|school|home: ")
             if location == 'abroad':
@@ -60,7 +60,7 @@ def main():
                 args.home = True
             else:
                 print('wrong input!')
-            login = open('data.json', 'w', encoding='utf-8')
+            login = open('etc/data.json', 'w', encoding='utf-8')
             data = {}
             username = input('username: ')
             data['username'] = username

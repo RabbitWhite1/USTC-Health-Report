@@ -4,15 +4,18 @@ import datetime
 import os
 import os.path as osp
 import platform
-import time
 import json
+import traceback
 from bs4 import BeautifulSoup
 from pprint import pprint
+from utils import *
+
+
 win10 = False
 if platform.platform().find('Windows-10') != -1:
     win10 = True
     from win10toast import ToastNotifier
-
+logger = Logger.get_logger()
 dirname = osp.split(osp.realpath(__file__))[0]
 
 
@@ -34,11 +37,7 @@ def done_today(log_path):
     return False
 
 
-def toast_log(message, log_path):
-    f = open(log_path, 'a')
-    f.write('[ ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' ]\t' + message)
-    f.close()
-    
+def toast(message):
     if win10:
         toaster = ToastNotifier()
         toaster.show_toast('中国科大健康打卡',
@@ -65,7 +64,7 @@ def main():
         session.trust_env = False
         
         # login
-        with open(osp.join(dirname, 'data.json'), 'r', encoding='utf-8') as f:
+        with open(osp.join(dirname, 'etc', 'data.json'), 'r', encoding='utf-8') as f:
             data = json.load(f, encoding='utf-8')
         username = data['username']
         password = data['passwd']
@@ -77,7 +76,8 @@ def main():
             province = data['province_postcode']
             city = data['city_postcode']
             if len(province) != 6 or len(city) != 6:
-                toast_log('邮政编码格式有误, 请确认. (povince={}, city={})'.format(province, city), osp.join(dirname, 'report.log'))
+                logger.info('邮政编码格式有误, 请确认. (povince={}, city={})'.format(province, city))
+                toast('邮政编码格式有误, 请确认. (povince={}, city={})'.format(province, city))
                 return 1
 
         # 登录
@@ -135,12 +135,13 @@ def main():
                 "other_detail": ""
             }
         print('Using these post data:')
-        pprint(param)
+        print(param)
         response = session.post("https://weixine.ustc.edu.cn/2020/daliy_report", data=param)
         print(f'上报结果: {response}')
     except Exception as e:
         print(str(e))
-        toast_log('出现错误!' + str(e) + '\n', osp.join(dirname, 'report.log'))
+        logger.info(traceback.format_exc())
+        toast('出现错误!' + str(e) + '\n')
         return 1
     else:
         if response.status_code == 200:
@@ -148,10 +149,11 @@ def main():
         else:
             message = f'failed(status code: {response.status_code})! '
         if data_template == 'abroad':
-            message += f'(country: {country})\n'
+            message += f'(country: {country})'
         else:
-            message += f'(province: {province}, city: {city})\n'
-        toast_log(message, osp.join(dirname, 'report.log'))
+            message += f'(province: {province}, city: {city})'
+        logger.info(message)
+        toast(message)
 
     return 0
 

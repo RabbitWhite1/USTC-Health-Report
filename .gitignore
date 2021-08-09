@@ -4,3 +4,4 @@ test.py
 .vscode
 test.ipynb
 data.json
+__pycache__
