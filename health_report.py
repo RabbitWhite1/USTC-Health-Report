@@ -63,7 +63,7 @@ def main():
         session.headers.update(headers)
         session.trust_env = False
         
-        # login
+        # read data.json
         with open(osp.join(dirname, 'etc', 'data.json'), 'r', encoding='utf-8') as f:
             data = json.load(f, encoding='utf-8')
         username = data['username']
@@ -142,7 +142,6 @@ def main():
         print(param)
         response = session.post("https://weixine.ustc.edu.cn/2020/daliy_report", data=param)
         print(f'上报结果: {response}')
-        print(response.content)
     except Exception as e:
         print(str(e))
         logger.info(traceback.format_exc())
