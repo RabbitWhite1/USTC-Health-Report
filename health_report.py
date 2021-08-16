@@ -75,9 +75,10 @@ def main():
         else:
             province = data['province_postcode']
             city = data['city_postcode']
+            town = data['town_postcode']
             if len(province) != 6 or len(city) != 6:
-                logger.info('邮政编码格式有误, 请确认. (povince={}, city={})'.format(province, city))
-                toast('邮政编码格式有误, 请确认. (povince={}, city={})'.format(province, city))
+                logger.info(f'邮政编码格式有误, 请确认. (povince={province}, city={city}, town={town})')
+                toast(f'邮政编码格式有误, 请确认. (povince={province}, city={city}, town={town})')
                 return 1
 
         # 登录
@@ -107,10 +108,13 @@ def main():
             # now_status 2 表示在家, 6 表示其他
             param = {
                 "_token": token,
-                "now_address": "1", "gps_now_address": "", "now_province": province, "gps_province": "",
+                "now_address": "1", "gps_now_address": "",
+                "now_province": province, "gps_province": "",
                 "now_city": city, "gps_city": "", "now_detail": "",
+                "now_country": town, "gps_country": "",
                 "body_condition": "1", "body_condition_detail": "",  "now_status": "2", "now_status_detail": "",
-                "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", "other_detail": ""
+                "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "",
+                "is_danger": "0", "other_detail": ""
             }
         else:
             # 默认在校, 且西校区
@@ -138,6 +142,7 @@ def main():
         print(param)
         response = session.post("https://weixine.ustc.edu.cn/2020/daliy_report", data=param)
         print(f'上报结果: {response}')
+        print(response.content)
     except Exception as e:
         print(str(e))
         logger.info(traceback.format_exc())

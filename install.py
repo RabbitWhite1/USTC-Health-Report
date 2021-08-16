@@ -75,10 +75,12 @@ def main():
                     data['data_template'] = 'school'
                 else:
                     data['data_template'] = 'home'
-                    province = input('省行政编号: ')
+                    province = input('省行政编号(好像是身份证前六位相关): ')
                     data['province_postcode'] = province
-                    city = input('市行政编号: ')
+                    city = input('市行政编号(好像是身份证前六位相关): ')
                     data['city_postcode'] = city
+                    town = input('县行政编号(好像是身份证前六位): ')
+                    data['town_postcode'] = town
             login.write(json.dumps(data, ensure_ascii=False))
             login.close()
 
