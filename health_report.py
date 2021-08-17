@@ -114,7 +114,7 @@ def main():
                 "now_country": town, "gps_country": "",
                 "body_condition": "1", "body_condition_detail": "",  "now_status": "2", "now_status_detail": "",
                 "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "",
-                "is_danger": "0", "other_detail": ""
+                "is_danger": "0", "other_detail": "", "is_goto_danger": "0"
             }
         else:
             # 默认在校, 且西校区
