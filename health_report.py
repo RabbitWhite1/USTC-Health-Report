@@ -101,7 +101,9 @@ def main():
                 "now_address": "3", "gps_now_address": "", "gps_province": "",
                 "gps_city": "", "now_detail": country,
                 "body_condition": "1", "body_condition_detail": "",  "now_status": "6", "now_status_detail": abroad_status_detail,
-                "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", "other_detail": ""
+                "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", "other_detail": "",
+                "is_danger": "0",
+                "is_goto_danger": "0"
             }
         elif data_template == 'home':   
             # 在国内且不在学校
@@ -136,7 +138,9 @@ def main():
                 "last_touch_sars": "0",
                 "last_touch_sars_date": "",
                 "last_touch_sars_detail": "",
-                "other_detail": ""
+                "other_detail": "",
+                "is_danger": "0",
+                "is_goto_danger": "0"
             }
         print('Using these post data:')
         print(param)
