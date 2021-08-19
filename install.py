@@ -95,6 +95,7 @@ def main():
         f = open('report.log', 'a')
         f.write('[ ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' ]\t' + 'installed the task!\n')
         f.close()
+        print('记得在 etc/baidu_api.json 中写入相应的 key 噢!(否则无法输入验证码)')
     elif args.uninstall:
         command = 'schtasks /delete /tn "Health Report"'
         os.system(command)

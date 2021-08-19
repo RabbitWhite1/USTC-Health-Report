@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import os.path as osp
 import yaml
 
@@ -55,3 +56,16 @@ class Logger:
 
         logger.setLevel(level)
         return logger
+
+
+if platform.platform().find('Windows-10') != -1:
+    win10 = True
+    from win10toast import ToastNotifier
+def toast(message):
+    if platform.platform().find('Windows-10') != -1:
+        toaster = ToastNotifier()
+        toaster.show_toast('中国科大健康打卡',
+                        message,
+                        icon_path=None,
+                        duration=5,
+                        threaded=True)

@@ -37,15 +37,6 @@ def done_today(log_path):
     return False
 
 
-def toast(message):
-    if win10:
-        toaster = ToastNotifier()
-        toaster.show_toast('中国科大健康打卡',
-                        message,
-                        icon_path=None,
-                        duration=5,
-                        threaded=True)
-
 def main():
     if done_today(osp.join(dirname, 'report.log')):
         return 0
@@ -75,7 +66,7 @@ def main():
         if data_template == 'abroad':
             country = data['country']
             abroad_status_detail = data['abroad_status_detail']
-        else:
+        elif data_template == 'home':
             province = data['province_postcode']
             city = data['city_postcode']
             town = data['town_postcode']
@@ -85,13 +76,8 @@ def main():
                 return 1
 
         # 登录
-        data = {'username': username, 'password': password,
-                'service': "https://weixine.ustc.edu.cn/2020/caslogin", 'model': "uplogin.jsp",
-                'warn': '', 'showCode': '', 'button': ''}
-        response = session.post("https://passport.ustc.edu.cn/login?service=https%3A%2F%2Fweixine.ustc.edu.cn%2F2020%2Fcaslogin", data=data)
-        response_html = BeautifulSoup(response.content, 'lxml').__str__()
-        print(f'登陆结果: {response}')
-                
+        response_html = login(session, username, password)
+
         # 获取 token
         # the format is like: <input name="_token" type="hidden" value="oZxXvuJav4tIWy7nHrdR6VuOsV9WS2tgdIluFdWM"/>
         token = re.search(r'<input name="_token" type="hidden" value="(.*)"/>', response_html).group(1)
@@ -128,6 +114,7 @@ def main():
             }
         else:
             # 默认在校, 且西校区
+            # TODO: 未补充 Town 相关.
             param = {
                 "_token": token,
                 "now_address": "1", "gps_now_address": "", "now_province": "340000", # 安徽省编码
