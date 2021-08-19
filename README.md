@@ -14,6 +14,7 @@ This script need `win10toast` to toast. run this to install:
 
 ```cmd
 pip install win10toast
+pip install urllib3==1.25.8
 ```
 
 ## Usage

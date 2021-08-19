@@ -77,7 +77,7 @@ def main():
 
         # 登录
         response_html = login(session, username, password)
-
+        # print(response_html)
         # 获取 token
         # the format is like: <input name="_token" type="hidden" value="oZxXvuJav4tIWy7nHrdR6VuOsV9WS2tgdIluFdWM"/>
         token = re.search(r'<input name="_token" type="hidden" value="(.*)"/>', response_html).group(1)

@@ -55,8 +55,6 @@ def get_verification_code(session):
             os.makedirs(tmp_dir)
         with open(tmp_img_path, 'wb') as f:
             f.write(img)
-        
-        # TODO: 图像识别
         verification_code = baidu_text_api(img)
         if verification_code:
             break
