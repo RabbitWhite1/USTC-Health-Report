@@ -69,6 +69,9 @@ def main():
         username = data['username']
         password = data['passwd']
         data_template = data['data_template']
+        jinji_lxr = data['jinji_lxr']
+        jinji_guanxi = data['jinji_guanxi']
+        jiji_mobile = data['jiji_mobile']
         if data_template == 'abroad':
             country = data['country']
             abroad_status_detail = data['abroad_status_detail']
@@ -101,9 +104,12 @@ def main():
                 "now_address": "3", "gps_now_address": "", "gps_province": "",
                 "gps_city": "", "now_detail": country,
                 "body_condition": "1", "body_condition_detail": "",  "now_status": "6", "now_status_detail": abroad_status_detail,
-                "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", "other_detail": "",
+                "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", 
                 "is_danger": "0",
-                "is_goto_danger": "0"
+                "is_goto_danger": "0",
+                # 注: 这傻逼命名法是健康打卡系统 POST 参数的傻逼命名
+                'jinji_lxr': jinji_lxr, 'jinji_guanxi': jinji_guanxi, "jiji_mobile": jiji_mobile,
+                "other_detail": "",
             }
         elif data_template == 'home':   
             # 在国内且不在学校
@@ -112,35 +118,31 @@ def main():
                 "_token": token,
                 "now_address": "1", "gps_now_address": "",
                 "now_province": province, "gps_province": "",
-                "now_city": city, "gps_city": "", "now_detail": "",
-                "now_country": town, "gps_country": "",
+                "now_city": city, "gps_city": "", 
+                "now_country": town, "gps_country": "", "now_detail": "",
                 "body_condition": "1", "body_condition_detail": "",  "now_status": "2", "now_status_detail": "",
                 "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "",
-                "is_danger": "0", "other_detail": "", "is_goto_danger": "0"
+                "is_danger": "0", "is_goto_danger": "0",
+                # 注: 这傻逼命名法是健康打卡系统 POST 参数的傻逼命名
+                'jinji_lxr': jinji_lxr, 'jinji_guanxi': jinji_guanxi, "jiji_mobile": jiji_mobile, "other_detail": ""
             }
         else:
             # 默认在校, 且西校区
             param = {
                 "_token": token,
-                "now_address": "1",
-                "gps_now_address": "",
-                "now_province": "340000", # 安徽省编码
-                "gps_province": "",
-                "now_city": "340100", # 合肥市编码
-                "gps_city": "",
+                "now_address": "1", "gps_now_address": "", "now_province": "340000", # 安徽省编码
+                "gps_province": "", "now_city": "340100", # 合肥市编码 "gps_city": "",
                 "now_detail": "",
                 "is_inschool": "6", # 西校区
-                "body_condition": "1",
-                "body_condition_detail": "",
-                "now_status": "1",
-                "now_status_detail": "",
+                "body_condition": "1", "body_condition_detail": "",
+                "now_status": "1", "now_status_detail": "",
                 "has_fever": "0",
-                "last_touch_sars": "0",
-                "last_touch_sars_date": "",
-                "last_touch_sars_detail": "",
+                "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "",
+                "is_danger": "0", "is_goto_danger": "0",
+                # 注: 这傻逼命名法是健康打卡系统 POST 参数的傻逼命名
+                'jinji_lxr': jinji_lxr, 'jinji_guanxi': jinji_guanxi, "jiji_mobile": jiji_mobile,
                 "other_detail": "",
-                "is_danger": "0",
-                "is_goto_danger": "0"
+
             }
         print('Using these post data:')
         print(param)
@@ -159,7 +161,7 @@ def main():
         if data_template == 'abroad':
             message += f'(country: {country})'
         else:
-            message += f'(province: {province}, city: {city})'
+            message += f'(province: {province}, city: {city}, town: {town})'
         logger.info(message)
         toast(message)
 

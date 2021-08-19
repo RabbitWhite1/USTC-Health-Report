@@ -62,10 +62,11 @@ def main():
                 print('wrong input!')
             login = open('etc/data.json', 'w', encoding='utf-8')
             data = {}
-            username = input('username: ')
-            data['username'] = username
-            passwd = input('passwd: ')
-            data['passwd'] = passwd
+            data['username'] = input('username: ')
+            data['passwd'] = input('passwd: ')
+            data['jinji_lxr'] = input('紧急联系人: ')
+            data['jinji_guanxi'] = input('与本人关系: ')
+            data['jiji_mobile'] = input('紧急联系人电话: ')
             if args.abroad:
                 data['data_template'] = 'abroad'
                 data['country'] = input('所在国家/地区: ')
@@ -75,12 +76,9 @@ def main():
                     data['data_template'] = 'school'
                 else:
                     data['data_template'] = 'home'
-                    province = input('省行政编号(好像是身份证前六位相关): ')
-                    data['province_postcode'] = province
-                    city = input('市行政编号(好像是身份证前六位相关): ')
-                    data['city_postcode'] = city
-                    town = input('县行政编号(好像是身份证前六位): ')
-                    data['town_postcode'] = town
+                    data['province_postcode'] = input('省行政编号(好像是身份证前六位相关): ')
+                    data['city_postcode'] = input('市行政编号(好像是身份证前六位相关): ')
+                    data['town_postcode'] = input('县行政编号(好像是身份证前六位): ')
             login.write(json.dumps(data, ensure_ascii=False))
             login.close()
 
