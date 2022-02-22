@@ -50,7 +50,8 @@ def main():
             return 1
 
         # create etc/data.json for username and password
-        if not args.keep:
+        # TODO: keep 功能有问题
+        if not args.keep or True:
             location = input("abroad|school|home: ")
             if location == 'abroad':
                 args.abroad = True

@@ -22,7 +22,7 @@ dirname = osp.split(osp.realpath(__file__))[0]
 def done_today(log_path):
     if not os.access(log_path, os.F_OK):
         return False
-    log = open(log_path, 'r')
+    log = open(log_path, 'r', encoding='utf-8')
     lines = log.readlines()
     last = None
     for line in lines[::-1]:
@@ -56,7 +56,7 @@ def main():
         
         # read data.json
         with open(osp.join(dirname, 'etc', 'data.json'), 'r', encoding='utf-8') as f:
-            data = json.load(f, encoding='utf-8')
+            data = json.load(f)
         username = data['username']
         password = data['passwd']
         data_template = data['data_template']
@@ -115,10 +115,14 @@ def main():
         else:
             # 默认在校, 且西校区
             # TODO: 未补充 Town 相关.
+            province = '340000'
+            city = '340100'
+            town = '340104'
             param = {
                 "_token": token,
-                "now_address": "1", "gps_now_address": "", "now_province": "340000", # 安徽省编码
-                "gps_province": "", "now_city": "340100", # 合肥市编码 "gps_city": "",
+                "now_address": "1", "gps_now_address": "", "now_province": province, # 安徽省编码
+                "gps_province": "", "now_city": city, "gps_city": "",
+                "now_country": town, "gps_country": "",
                 "now_detail": "",
                 "is_inschool": "6", # 西校区
                 "body_condition": "1", "body_condition_detail": "",

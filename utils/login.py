@@ -11,7 +11,10 @@ tmp_dir = osp.join(osp.dirname(__file__), '..', 'tmp')
 tmp_img_path = osp.join(tmp_dir, 'tmp.jpg')
 logger = Logger.get_logger()
 
-
+proxies = {
+  "http": None,
+  "https": None,
+}
 baidu_api_keys = json.load(open(osp.join(osp.dirname(__file__), '..', 'etc', 'baidu_api.json')))
 API_KEY = baidu_api_keys['API_KEY'] # API Key
 SECRET_KEY = baidu_api_keys['SECRET_KEY'] # Secret Key
@@ -24,7 +27,7 @@ def baidu_text_api(img: bytes):
         'client_id': API_KEY,
         'client_secret': SECRET_KEY
     }
-    r = requests.post(TOKEN_URL, data=data)
+    r = requests.post(TOKEN_URL, data=data, proxies=proxies)
     if 'access_token' in r.json():
         access_token = r.json().get('access_token')
     else:
@@ -38,7 +41,7 @@ def baidu_text_api(img: bytes):
     access_token = access_token
     request_url = OCR_URL + "?access_token=" + access_token
     headers = {'content-type': 'application/x-www-form-urlencoded'}
-    response = requests.post(request_url, data=params, headers=headers)
+    response = requests.post(request_url, data=params, headers=headers, proxies=proxies)
     try:
         print(response.json())
         verification_code = response.json()['words_result'][0]['words']
