@@ -6,15 +6,17 @@ import os.path as osp
 import platform
 import json
 import traceback
-from bs4 import BeautifulSoup
-from pprint import pprint
+try:
+    from rich import print
+except e:
+    print(e)
+    pass
 from utils import *
 
 
 win10 = False
 if platform.platform().find('Windows-10') != -1:
     win10 = True
-    from win10toast import ToastNotifier
 logger = Logger.get_logger()
 dirname = osp.split(osp.realpath(__file__))[0]
 
@@ -74,17 +76,18 @@ def main():
                 logger.info(f'邮政编码格式有误, 请确认. (povince={province}, city={city}, town={town})')
                 toast(f'邮政编码格式有误, 请确认. (povince={province}, city={city}, town={town})')
                 return 1
+        else:
+            assert data_template == 'school'
 
         # 登录
         response_html = login(session, username, password)
-        # print(response_html)
         # 获取 token
-        # the format is like: <input name="_token" type="hidden" value="oZxXvuJav4tIWy7nHrdR6VuOsV9WS2tgdIluFdWM"/>
+        # 格式: <input name="_token" type="hidden" value="oZxXvuJav4tIWy7nHrdR6VuOsV9WS2tgdIluFdWM"/>
         token = re.search(r'<input name="_token" type="hidden" value="(.*)"/>', response_html).group(1)
         print(f'token: {token}')
 
         if data_template == 'abroad':
-            # 在国外
+            # 在国外 (注: 上次更新还是上次, 可能有纰漏)
             param = {
                 "_token": token,
                 "now_address": "3", "gps_now_address": "", "gps_province": "",
@@ -93,12 +96,11 @@ def main():
                 "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "", 
                 "is_danger": "0",
                 "is_goto_danger": "0",
-                # 注: 这傻逼命名法是健康打卡系统 POST 参数的傻逼命名
                 'jinji_lxr': jinji_lxr, 'jinji_guanxi': jinji_guanxi, "jiji_mobile": jiji_mobile,
                 "other_detail": "",
             }
         elif data_template == 'home':   
-            # 在国内且不在学校
+            # 在国内且不在学校 (注: 上次更新还是上次, 可能有纰漏)
             # now_status 2 表示在家, 6 表示其他
             param = {
                 "_token": token,
@@ -109,31 +111,31 @@ def main():
                 "body_condition": "1", "body_condition_detail": "",  "now_status": "2", "now_status_detail": "",
                 "has_fever": "0", "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "",
                 "is_danger": "0", "is_goto_danger": "0",
-                # 注: 这傻逼命名法是健康打卡系统 POST 参数的傻逼命名
                 'jinji_lxr': jinji_lxr, 'jinji_guanxi': jinji_guanxi, "jiji_mobile": jiji_mobile, "other_detail": ""
             }
         else:
             # 默认在校, 且西校区
-            # TODO: 未补充 Town 相关.
+            assert data_template == 'school'
             province = '340000'
             city = '340100'
             town = '340104'
             param = {
-                "_token": token,
-                "now_address": "1", "gps_now_address": "", "now_province": province, # 安徽省编码
-                "gps_province": "", "now_city": city, "gps_city": "",
-                "now_country": town, "gps_country": "",
-                "now_detail": "",
-                "is_inschool": "6", # 西校区
-                "body_condition": "1", "body_condition_detail": "",
-                "now_status": "1", "now_status_detail": "",
-                "has_fever": "0",
-                "last_touch_sars": "0", "last_touch_sars_date": "", "last_touch_sars_detail": "",
-                "is_danger": "0", "is_goto_danger": "0",
-                # 注: 这傻逼命名法是健康打卡系统 POST 参数的傻逼命名
-                'jinji_lxr': jinji_lxr, 'jinji_guanxi': jinji_guanxi, "jiji_mobile": jiji_mobile,
-                "other_detail": "",
-
+                '_token': token,
+                'juzhudi': "西校区",
+                'body_condition': 1,
+                'body_condition_detail': "",
+                'now_status': 1,
+                'now_status_detail': "",
+                'has_fever': 0,
+                'last_touch_sars': 0,
+                'last_touch_sars_date': "",
+                'last_touch_sars_detail': "",
+                'is_danger': 0,
+                'is_goto_danger': 0,
+                'jinji_lxr': jinji_lxr,
+                'jinji_guanxi': jinji_guanxi,
+                'jiji_mobile': jiji_mobile,
+                'other_detail': "",
             }
         print('Using these post data:')
         print(param)

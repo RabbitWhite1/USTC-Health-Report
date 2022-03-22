@@ -49,7 +49,7 @@ class Logger:
 
         if filename:
             # file handler
-            fh = logging.FileHandler(filename)
+            fh = logging.FileHandler(filename, encoding='utf-8')
             fh.setLevel(level)
             fh.setFormatter(fmt)
             logger.addHandler(fh)
@@ -60,12 +60,21 @@ class Logger:
 
 if platform.platform().find('Windows-10') != -1:
     win10 = True
-    from win10toast import ToastNotifier
-def toast(message):
-    if platform.platform().find('Windows-10') != -1:
-        toaster = ToastNotifier()
-        toaster.show_toast('中国科大健康打卡',
-                        message,
-                        icon_path=None,
-                        duration=5,
-                        threaded=True)
+    try:
+        from win10toast import ToastNotifier
+    except ModuleNotFoundError as e:
+        print('please install win10toast for convenience: pip install win10toast')
+        win10 = False
+
+if win10:
+    def toast(message):
+        if platform.platform().find('Windows-10') != -1:
+            toaster = ToastNotifier()
+            toaster.show_toast('中国科大健康打卡',
+                            message,
+                            icon_path=None,
+                            duration=5,
+                            threaded=True)
+else:
+    def toast(message):
+        pass

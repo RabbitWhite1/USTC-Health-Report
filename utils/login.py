@@ -15,11 +15,15 @@ proxies = {
   "http": None,
   "https": None,
 }
-baidu_api_keys = json.load(open(osp.join(osp.dirname(__file__), '..', 'etc', 'baidu_api.json')))
-API_KEY = baidu_api_keys['API_KEY'] # API Key
-SECRET_KEY = baidu_api_keys['SECRET_KEY'] # Secret Key
-TOKEN_URL = 'https://aip.baidubce.com/oauth/2.0/token'  # 获取token请求url
-OCR_URL = 'https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic' # 文字识别OCRAPI
+enable_baidu_api = True
+try:
+    baidu_api_keys = json.load(open(osp.join(osp.dirname(__file__), '..', 'etc', 'baidu_api.json')))
+    API_KEY = baidu_api_keys['API_KEY'] # API Key
+    SECRET_KEY = baidu_api_keys['SECRET_KEY'] # Secret Key
+    TOKEN_URL = 'https://aip.baidubce.com/oauth/2.0/token'  # 获取token请求url
+    OCR_URL = 'https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic' # 文字识别OCRAPI
+except:
+    enable_baidu_api = False
 
 def baidu_text_api(img: bytes):
     data = {
@@ -72,7 +76,10 @@ def login(session, username, password):
     login_form = response.find_all(class_='loginForm form-style')[0]
     CAS_LT = login_form.find_next(id='CAS_LT')['value']
     # 2. get and crack the verification code
-    verification_code = get_verification_code(session)
+    if enable_baidu_api:
+        verification_code = get_verification_code(session)
+    else:
+        verification_code = False
     data = {'username': username, 'password': password, 
             'showCode': '1', 'LT': verification_code, 'CAS_LT': CAS_LT,
             'service': "https://weixine.ustc.edu.cn/2020/caslogin", 'model': "uplogin.jsp",
