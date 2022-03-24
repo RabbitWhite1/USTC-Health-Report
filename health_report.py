@@ -84,6 +84,13 @@ def main():
         logger.debug('try to get token')
         token = re.search(r'<input name="_token" type="hidden" value="(.*)"/>', response_html).group(1)
         logger.debug(f'token: {token}')
+        token_group = re.search(r'<input name="_token" type="hidden" value="(.*)"/>', response_html)
+        if token_group is None:
+            logger.info('获取 token 失败 (可能账号密码不正确)')
+            toast('获取 token 失败 (可能账号密码不正确)')
+            return 1
+        token = token_group.group(1)
+        logger.debug(f'token: {token}')
 
         if data_template == 'abroad':
             logger.debug(f'abroad template') 
