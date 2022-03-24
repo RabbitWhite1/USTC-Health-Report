@@ -6,19 +6,13 @@ import os.path as osp
 import platform
 import json
 import traceback
-try:
-    from rich import print
-except e:
-    print(e)
-    pass
 from utils import *
-
+logger = Logger.get_logger()
+dirname = osp.split(osp.realpath(__file__))[0]
 
 win10 = False
 if platform.platform().find('Windows-10') != -1:
     win10 = True
-logger = Logger.get_logger()
-dirname = osp.split(osp.realpath(__file__))[0]
 
 
 def done_today(log_path):
@@ -40,7 +34,9 @@ def done_today(log_path):
 
 
 def main():
+    logger.debug('checking today')
     if done_today(osp.join(dirname, 'report.log')):
+        logger.debug('reported today')
         return 0
     
     try:
@@ -57,6 +53,7 @@ def main():
         session.trust_env = False
         
         # read data.json
+        logger.debug('reading data.json')
         with open(osp.join(dirname, 'etc', 'data.json'), 'r', encoding='utf-8') as f:
             data = json.load(f)
         username = data['username']
@@ -80,13 +77,16 @@ def main():
             assert data_template == 'school'
 
         # 登录
+        logger.debug('try to login')
         response_html = login(session, username, password)
         # 获取 token
         # 格式: <input name="_token" type="hidden" value="oZxXvuJav4tIWy7nHrdR6VuOsV9WS2tgdIluFdWM"/>
+        logger.debug('try to get token')
         token = re.search(r'<input name="_token" type="hidden" value="(.*)"/>', response_html).group(1)
-        print(f'token: {token}')
+        logger.debug(f'token: {token}')
 
         if data_template == 'abroad':
+            logger.debug(f'abroad template') 
             # 在国外 (注: 上次更新还是上次, 可能有纰漏)
             param = {
                 "_token": token,
@@ -99,7 +99,8 @@ def main():
                 'jinji_lxr': jinji_lxr, 'jinji_guanxi': jinji_guanxi, "jiji_mobile": jiji_mobile,
                 "other_detail": "",
             }
-        elif data_template == 'home':   
+        elif data_template == 'home': 
+            logger.debug(f'home template') 
             # 在国内且不在学校 (注: 上次更新还是上次, 可能有纰漏)
             # now_status 2 表示在家, 6 表示其他
             param = {
@@ -116,6 +117,7 @@ def main():
         else:
             # 默认在校, 且西校区
             assert data_template == 'school'
+            logger.debug(f'school template')
             province = '340000'
             city = '340100'
             town = '340104'
@@ -137,12 +139,12 @@ def main():
                 'jiji_mobile': jiji_mobile,
                 'other_detail': "",
             }
-        print('Using these post data:')
-        print(param)
+        logger.debug(f'using param: {param}')
+        logger.debug(f'post the report')
         response = session.post("https://weixine.ustc.edu.cn/2020/daliy_report", data=param)
-        print(f'上报结果: {response}')
+        logger.info(f'上报结果: {response}')
     except Exception as e:
-        print(str(e))
+        logger.info(str(e))
         logger.info(traceback.format_exc())
         toast('出现错误!' + str(e) + '\n')
         return 1
