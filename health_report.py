@@ -83,7 +83,12 @@ def main():
         response_html = login(session, username, password)
         # 获取 token
         # 格式: <input name="_token" type="hidden" value="oZxXvuJav4tIWy7nHrdR6VuOsV9WS2tgdIluFdWM"/>
-        token = re.search(r'<input name="_token" type="hidden" value="(.*)"/>', response_html).group(1)
+        token_group = re.search(r'<input name="_token" type="hidden" value="(.*)"/>', response_html)
+        if token_group is None:
+            logger.info('获取 token 失败 (可能账号密码不正确)')
+            toast('获取 token 失败 (可能账号密码不正确)')
+            return 1
+        token = token_group.group(1)
         print(f'token: {token}')
 
         if data_template == 'abroad':
