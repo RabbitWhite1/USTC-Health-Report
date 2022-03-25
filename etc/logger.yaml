@@ -1,4 +1,4 @@
 reporter:
-  level: debug
+  level: info
   filename: '../report.log'
   fmt: '[ %(asctime)s ]: %(message)s'
