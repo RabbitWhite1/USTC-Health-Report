@@ -51,6 +51,8 @@ def main():
         data = {}
         data['username'] = input('学号: ')
         data['passwd'] = input('密码: ')
+        data['dorm_building'] = input('宿舍楼号: ')
+        data['dorm'] = input('宿舍房号: ')
         data['jinji_lxr'] = input('紧急联系人: ')
         data['jinji_guanxi'] = input('与本人关系: ')
         data['jiji_mobile'] = input('紧急联系人电话: ')

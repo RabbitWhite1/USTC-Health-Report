@@ -131,6 +131,8 @@ def main():
             param = {
                 '_token': token,
                 'juzhudi': "西校区",
+                'dorm_building': 2,
+                'dorm': 538,
                 'body_condition': 1,
                 'body_condition_detail': "",
                 'now_status': 1,
